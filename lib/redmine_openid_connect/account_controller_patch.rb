@@ -1,29 +1,23 @@
 module RedmineOpenidConnect
   module AccountControllerPatch
     def self.included(base)
-      base.send(:include, InstanceMethods)
-
-      base.class_eval do
-        # Add before filters and stuff here
-        alias_method_chain :login, :openid_connect
-        alias_method_chain :logout, :openid_connect
-        alias_method_chain :invalid_credentials, :openid_connect
-      end
+      base.send(:prepend, InstanceMethods)
     end
   end # AccountControllerPatch
 
   module InstanceMethods
-    def login_with_openid_connect
-      if OicSession.disabled? || params[:local_login].present? || request.post?
-        return login_without_openid_connect
+    def login
+      if request.post? && [params[:username], User.find_by_login(params[:username]).try(:mails)].
+                          join.include?("@serpro.gov.br")
+        redirect_to oic_login_url
       end
-      
-      redirect_to oic_login_url
+
+      return super
     end
 
-    def logout_with_openid_connect
+    def logout
       if OicSession.disabled? || params[:local_login].present?
-        return logout_without_openid_connect
+        return super
       end
 
       oic_session = OicSession.find(session[:oic_session_id])
@@ -57,7 +51,7 @@ module RedmineOpenidConnect
           end
         end
       end
-      
+
       redirect_to oic_session.authorization_url
     end
 
@@ -89,7 +83,7 @@ module RedmineOpenidConnect
             return redirect_to oic_local_logout
           end
         end
-        
+
         # get access token and user info
         oic_session.get_access_token!
         user_info = oic_session.get_user_info!
@@ -105,13 +99,18 @@ module RedmineOpenidConnect
         if user.nil?
           user = User.new
 
-          user.login = user_info["user_name"]
+          user.login = user_info["CPF"]
+          nome=user_info["NOME"].gsub(/ .*/,'')
+          sobrenome=user_info["NOME"].gsub(/^[^ ]* ?/,'')
+          while sobrenome.size > 30
+            sobrenome.match?(/^. /) ? sobrenome.gsub!(/^../,'') : sobrenome.gsub!(/^(.)[^ ]*/, '\1')
+          end
+          email=user_info["EMAIL"]
 
           attributes = {
-            firstname: user_info["given_name"],
-            lastname: user_info["family_name"],
-            mail: user_info["email"],
-            mail_notification: 'only_my_events',
+            firstname: nome,
+            lastname: sobrenome,
+            mail: email,
             last_login_on: Time.now
           }
 
@@ -139,8 +138,8 @@ module RedmineOpenidConnect
       end
     end
 
-    def invalid_credentials_with_openid_connect
-      return invalid_credentials_without_openid_connect unless OicSession.enabled?
+    def invalid_credentials
+      return super unless OicSession.enabled?
 
       logger.warn "Failed login for '#{params[:username]}' from #{request.remote_ip} at #{Time.now.utc}"
       flash.now[:error] = (l(:notice_account_invalid_creditentials) + ". " + "<a href='#{signout_path}'>Try a different account</a>").html_safe

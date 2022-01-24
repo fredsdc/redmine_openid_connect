@@ -34,7 +34,7 @@ class OicSession < ActiveRecord::Base
 
   def self.get_dynamic_config
     hash = Digest::SHA1.hexdigest client_config.to_json
-    expiry = client_config[:dynamic_config_expiry] || 86400
+    expiry = client_config[:dynamic_config_expiry].presence || 86400
     Rails.cache.fetch("oic_session_dynamic_#{hash}", expires_in: expiry) do
       HTTParty::Basement.default_options.update(verify: false) if client_config[:disable_ssl_validation]
       ActiveSupport::HashWithIndifferentAccess.new HTTParty.get(openid_configuration_url)
