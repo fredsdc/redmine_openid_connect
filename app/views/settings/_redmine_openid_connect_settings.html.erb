@@ -39,3 +39,31 @@
   <label><%= t('config.disable_ssl_validation') %></label>
   <%= check_box_tag 'settings[disable_ssl_validation]', true, @settings['disable_ssl_validation'] %>
 </p>
+
+<fieldset class="box tabular"><legend><%=l(:label_attribute_plural)%></legend>
+  attr_domain
+  <p>
+    <label><%= l(:field_attr_domain) %></label>
+    <%= text_field_tag 'settings[attr_domain]', @settings['attr_domain'] %>
+  </p>
+  <p>
+    <label><%= l(:field_attr_login) %></label>
+    <%= text_field_tag 'settings[attr_login]', @settings['attr_login'] %>
+  </p>
+  <p>
+    <label><%= l(:field_attr_firstname) %></label>
+    <%= text_field_tag 'settings[attr_firstname]', @settings['attr_firstname'] %>
+    <%= check_box_tag 'settings[attr_firstname_compose]', true, @settings['attr_firstname_compose'] %>
+    <span><%= l(:first_word_only) %></span>
+  </p>
+  <p>
+    <label><%= l(:field_attr_lastname) %></label>
+    <%= text_field_tag 'settings[attr_lastname]', @settings['attr_lastname'] %>
+    <%= check_box_tag 'settings[attr_lastname_compose]', true, @settings['attr_lastname_compose'] %>
+    <span><%= l(:skip_first_word_and_abreviate) %></span>
+  </p>
+  <p>
+    <label><%= l(:field_attr_mail) %></label>
+    <%= text_field_tag 'settings[attr_mail]', @settings['attr_mail'] %>
+  </p>
+</fieldset>

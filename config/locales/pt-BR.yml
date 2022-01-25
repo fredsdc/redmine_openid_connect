@@ -21,3 +21,6 @@ pt-BR:
   signed_out: Você saiu da aplicação.
   click_to_redirect: Clique aqui se você não for redirecionado.
   wrong_target_origin: "Origem alvo errada:"
+  first_word_only: Apenas a primeira palavra
+  skip_first_word_and_abreviate: Pular primeira palavra e abreviar
+  field_attr_domain: Domínio

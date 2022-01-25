@@ -21,3 +21,6 @@ en:
   signed_out: You have been signed out.
   click_to_redirect: Click here if the login does not redirect you.
   wrong_target_origin: "Wrong target origin:"
+  first_word_only: First word only
+  skip_first_word_and_abreviate: Skip first word and use initials
+  field_attr_domain: Domain

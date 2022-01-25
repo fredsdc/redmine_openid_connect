@@ -7,8 +7,9 @@ module RedmineOpenidConnect
 
   module InstanceMethods
     def login
-      if request.post? && [params[:username], User.find_by_login(params[:username]).try(:mails)].
-                          join.include?("@serpro.gov.br")
+      domain = OicSession.client_config[:attr_domain].to_s
+      if request.post? && domain.present? &&
+        [params[:username], User.find_by_login(params[:username]).try(:mails)].join(",").include?(domain)
         return redirect_to oic_login_url
       end
 
@@ -88,6 +89,7 @@ module RedmineOpenidConnect
         # get access token and user info
         oic_session.get_access_token!
         user_info = oic_session.get_user_info!
+        attrs = oic_session.class.attributes
 
         # verify application authorization
         unless oic_session.authorized?
@@ -95,23 +97,27 @@ module RedmineOpenidConnect
         end
 
         # Check if there's already an existing user
-        user = User.find_by_mail(user_info["email"])
+        user = User.find_by_mail(user_info[attrs[:mail]])
 
         if user.nil?
           user = User.new
 
-          user.login = user_info["CPF"]
-          nome=user_info["NOME"].gsub(/ .*/,'')
-          sobrenome=user_info["NOME"].gsub(/^[^ ]* ?/,'')
-          while sobrenome.size > 30
-            sobrenome.match?(/^. /) ? sobrenome.gsub!(/^../,'') : sobrenome.gsub!(/^(.)[^ ]*/, '\1')
+          user.login = user_info[attrs[:login]].gsub(/ /, '')
+          name       = user_info[attrs[:first]].gsub(/  */, ' ').gsub(/^ /, '').gsub(/ $/, '')
+          surname    = user_info[attrs[:last]].gsub(/  */, ' ').gsub(/^ /, '').gsub(/ $/, '')
+          mail       = user_info[attrs[:mail]].gsub(/  */, ' ').gsub(/^ /, '').gsub(/ $/, '')
+          name       = name.gsub(/ .*/,'') if attrs[:first_comp]
+          if attrs[:last_comp]
+            surname.gsub!(/^[^ ]* /, '')
+            while surname.size > 30
+              surname.match?(/^. /) ? surname.gsub!(/^. /,'') : surname.gsub!(/^(.)[^ ]*/, '\1')
+            end
           end
-          email=user_info["EMAIL"]
 
           attributes = {
-            firstname: nome,
-            lastname: sobrenome,
-            mail: email,
+            firstname:     name,
+            lastname:      surname,
+            mail:          mail,
             last_login_on: Time.now
           }
 

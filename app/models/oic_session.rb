@@ -32,6 +32,17 @@ class OicSession < ActiveRecord::Base
     client_config[:openid_connect_server_url] + '/.well-known/openid-configuration'
   end
 
+  def self.attributes
+    {
+      login:      client_config[:attr_login],
+      first:      client_config[:attr_firstname],
+      first_comp: client_config[:attr_firstname_compose],
+      last:       client_config[:attr_lastname],
+      last_comp:  client_config[:attr_lastname_compose],
+      mail:       client_config[:attr_mail]
+    }
+  end
+
   def self.get_dynamic_config
     hash = Digest::SHA1.hexdigest client_config.to_json
     expiry = client_config[:dynamic_config_expiry].presence || 86400
