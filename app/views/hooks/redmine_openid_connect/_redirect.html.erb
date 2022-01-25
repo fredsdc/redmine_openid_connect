@@ -1,0 +1,12 @@
+<div id="redirect_to_oic_login_url">
+  <div style="text-align: center; margin: 10px;">--- <%= l(:or) %> ---</div>
+  <form action="<%= oic_login_url %>">
+    <input value="<%= l(:redirect_to_oic_login_url) %>" style="width: 100;" tabindex="6" type="submit">
+  </form>
+</div>
+
+<%= javascript_tag do %>
+$(document).ready(function(){
+  $('#redirect_to_oic_login_url').appendTo($('#login-form form'));
+});
+<% end %>

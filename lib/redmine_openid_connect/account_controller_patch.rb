@@ -9,10 +9,10 @@ module RedmineOpenidConnect
     def login
       if request.post? && [params[:username], User.find_by_login(params[:username]).try(:mails)].
                           join.include?("@serpro.gov.br")
-        redirect_to oic_login_url
+        return redirect_to oic_login_url
       end
 
-      return super
+      super
     end
 
     def logout
@@ -26,7 +26,8 @@ module RedmineOpenidConnect
       reset_session
       redirect_to oic_session.end_session_url
     rescue ActiveRecord::RecordNotFound => e
-      redirect_to oic_local_logout_url
+      oic_local_logout
+      redirect_to signin_url
     end
 
     # performs redirect to SSO server
@@ -70,7 +71,7 @@ module RedmineOpenidConnect
 
         # verify request state or reauthorize
         unless oic_session.state == params[:state]
-          flash[:error] = "Invalid OpenID Connect request."
+          flash[:error] = l(:error_invalid_openid_connect_request)
           return redirect_to oic_local_logout
         end
 
@@ -79,7 +80,7 @@ module RedmineOpenidConnect
         # verify id token nonce or reauthorize
         if oic_session.id_token.present?
           unless oic_session.claims['nonce'] == oic_session.nonce
-            flash[:error] = "Invalid ID Token."
+            flash[:error] = l(:error_invalid_id_token)
             return redirect_to oic_local_logout
           end
         end
@@ -122,9 +123,9 @@ module RedmineOpenidConnect
             oic_session.save!
             successful_authentication(user)
           else
-            flash.now[:warning] ||= "Unable to create user #{user.login}: "
+            flash.now[:warning] ||= l(:error_unable_to_create_user, :name => user.login) + " "
             user.errors.full_messages.each do |error|
-              logger.warn "Unable to create user #{user.login} due to #{error}"
+              logger.warn "#{l(:error_unable_to_create_user_due_to, :name => user.login, :error => error)}"
               flash.now[:warning] += "#{error}. "
             end
             return invalid_credentials
@@ -141,8 +142,8 @@ module RedmineOpenidConnect
     def invalid_credentials
       return super unless OicSession.enabled?
 
-      logger.warn "Failed login for '#{params[:username]}' from #{request.remote_ip} at #{Time.now.utc}"
-      flash.now[:error] = (l(:notice_account_invalid_creditentials) + ". " + "<a href='#{signout_path}'>Try a different account</a>").html_safe
+      logger.warn l(:error_failed_login_for, :name => params[:username], :ip => request.remote_ip, :time => Time.now.utc)
+      flash.now[:error] = (l(:notice_account_invalid_creditentials) + ". " + "<a href='#{signout_path}'>" + l(:try_different_account) + "</a>").html_safe
     end
 
     def rpiframe

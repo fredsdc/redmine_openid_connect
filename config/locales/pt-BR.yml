@@ -1,0 +1,23 @@
+# English strings go here for Rails i18n
+pt-BR:
+  config:
+    enabled: Habilitado
+    header: Configuração do OpenID Connect
+    client_id: Client ID
+    openid_connect_server_url: URL do servidor OpenID Connect
+    client_secret: Client Secret
+    group: Grupo autorizado (branco para todos os usuários)
+    admin_group: Gruopo de administradores (membros deste grupo são administradores)
+    dynamic_config_expiry: Tempo entre consultas da configuração openid (padrão 1 dia)
+  redirect_to_oic_login_url: Login Único do Serpro
+  or: ou
+  error_invalid_openid_connect_request: Requisição OpenID Connect inválida.
+  error_invalid_id_token: ID Token inválido.
+  error_unable_to_create_user: "Não consigo criar usuário %{name}:"
+  error_unable_to_create_user_due_to: "Não consigo criar usuário %{name} porque %{error}:"
+  error_failed_login_for: "Login falhou para %{name} de %{ip} às %{time}"
+  try_different_account: Tente uma conta diferente
+  notice_account_invalid_creditentials: Credenciais de conta inválidas
+  signed_out: Você saiu da aplicação.
+  click_to_redirect: Clique aqui se você não for redirecionado.
+  wrong_target_origin: "Origem alvo errada:"

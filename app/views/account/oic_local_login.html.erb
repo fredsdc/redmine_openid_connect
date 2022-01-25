@@ -12,6 +12,6 @@
 
     url = wl.protocol + '//' + wl.hostname  + port + wl.pathname + '?' + wl.hash.substring(1);
     wl.replace(url);
-    document.write('<p>Click <a href="' + url + '">here</a> if the login does not redirect you.</p>');
+    document.write('<p><a href="' + url + '"><%= l(:click_to_redirect) %></a></p>');
   }
 <% end %>

@@ -9,3 +9,15 @@ en:
     group: Authorized group (blank if all users are authorized)
     admin_group: Admins group (members of this group are treated as admin)
     dynamic_config_expiry: How often to retrieve openid configuration (default 1 day)
+  redirect_to_oic_login_url: Login with Serpro SSO
+  or: or
+  error_invalid_openid_connect_request: Invalid OpenID Connect request.
+  error_invalid_id_token: Invalid ID Token.
+  error_unable_to_create_user: "Unable to create user %{name}:"
+  error_unable_to_create_user_due_to: "Unable to create user %{name} due to %{error}:"
+  error_failed_login_for: "Failed login for %{name} from %{ip} at %{time}"
+  try_different_account: Try a different account
+  notice_account_invalid_creditentials: Invalid account creditentials
+  signed_out: You have been signed out.
+  click_to_redirect: Click here if the login does not redirect you.
+  wrong_target_origin: "Wrong target origin:"
