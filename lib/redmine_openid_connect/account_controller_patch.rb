@@ -13,7 +13,7 @@ module RedmineOpenidConnect
     end
 
     def logout
-      if OicSession.disabled? || params[:local_login].present?
+      if !OicSession.enabled? || params[:local_login].present?
         return super
       end
 
