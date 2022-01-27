@@ -2,7 +2,7 @@
 
 <p>
   <label><%= t('config.enabled') %></label>
-  <%= check_box_tag 'settings[enabled]', false, @settings['enabled'] %>
+  <%= check_box_tag 'settings[enabled]', true, @settings['enabled'] %>
 </p>
 
 <p>
@@ -60,7 +60,7 @@
     <label><%= l(:field_attr_lastname) %></label>
     <%= text_field_tag 'settings[attr_lastname]', @settings['attr_lastname'] %>
     <%= check_box_tag 'settings[attr_lastname_compose]', true, @settings['attr_lastname_compose'] %>
-    <span><%= l(:skip_first_word_and_abreviate) %></span>
+    <span><%= l(:skip_first_word) %></span>
   </p>
   <p>
     <label><%= l(:field_attr_mail) %></label>

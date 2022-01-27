@@ -23,7 +23,7 @@ class OicSession < ActiveRecord::Base
   end
 
   def self.enabled?
-    client_config[:enabled]
+    client_config[:enabled].present?
   end
 
   def self.disabled?

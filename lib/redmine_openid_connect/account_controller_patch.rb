@@ -2,8 +2,9 @@ module RedmineOpenidConnect
   module AccountControllerPatch
     def login
       domain = OicSession.client_config[:attr_domain].to_s
-      if request.post? && domain.present? &&
-        [params[:username], User.find_by_login(params[:username]).try(:mails)].join(",").include?(domain)
+      if OicSession.enabled? && !params[:local_login].present? &&
+         request.post? && domain.present? &&
+         [params[:username], User.find_by_login(params[:username]).try(:mails)].join(",").include?(domain)
         return redirect_to oic_login_url
       end
 
@@ -101,12 +102,12 @@ module RedmineOpenidConnect
           name       = user_info[attrs[:first]].gsub(/  */, ' ').gsub(/^ /, '').gsub(/ $/, '')
           surname    = user_info[attrs[:last]].gsub(/  */, ' ').gsub(/^ /, '').gsub(/ $/, '')
           mail       = user_info[attrs[:mail]].gsub(/  */, ' ').gsub(/^ /, '').gsub(/ $/, '')
-          name       = name.gsub(/ .*/,'') if attrs[:first_comp]
-          if attrs[:last_comp]
-            surname.gsub!(/^[^ ]* /, '')
-            while surname.size > 30
-              surname.match?(/^. /) ? surname.gsub!(/^. /,'') : surname.gsub!(/^(.)[^ ]*/, '\1')
-            end
+
+          name.gsub!(/ .*/,'') if attrs[:first_comp]
+          surname.gsub!(/^[^ ]* /, '') if attrs[:last_comp]
+
+          while surname.size > 30
+            surname.match?(/^. /) ? surname.gsub!(/^. /,'') : surname.gsub!(/^(.)[^ ]*/, '\1')
           end
 
           attributes = {
