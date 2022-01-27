@@ -1,11 +1,5 @@
 module RedmineOpenidConnect
   module AccountControllerPatch
-    def self.included(base)
-      base.send(:prepend, InstanceMethods)
-    end
-  end # AccountControllerPatch
-
-  module InstanceMethods
     def login
       domain = OicSession.client_config[:attr_domain].to_s
       if request.post? && domain.present? &&
@@ -13,6 +7,7 @@ module RedmineOpenidConnect
         return redirect_to oic_login_url
       end
 
+      OicSession.find_by_id(session[:oic_session_id]).try(:destroy)
       super
     end
 
@@ -141,6 +136,7 @@ module RedmineOpenidConnect
           oic_session.user_id = user.id
           oic_session.save!
           successful_authentication(user)
+          user.update_last_login_on!
         end # if user.nil?
       end
     end
@@ -179,5 +175,5 @@ module RedmineOpenidConnect
         end
       end
     end
-  end # InstanceMethods
+  end
 end

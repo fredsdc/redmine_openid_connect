@@ -1,30 +1,16 @@
 module RedmineOpenidConnect
   module ApplicationControllerPatch
-    def self.included(base)
-      base.send(:prepend, InstanceMethods)
-    end
-  end # ApplicationControllerPatch
-
-  module InstanceMethods
-    def require_login
-      return super unless OicSession.enabled?
-
-      if !User.current.logged?
-        redirect_to oic_login_url
-        return false
+    def session_expiration
+      unless params[:action].match?(/^oic_/)
+        super
       end
     end
 
-    # set the current user _without_ resetting the session first
+    # set the current user _without_ resetting the oic_session_id
     def logged_user=(user)
-      return send(:super, user) unless OicSession.enabled?
-
-      if user && user.is_a?(User)
-        User.current = user
-        start_user_session(user)
-      else
-        User.current = User.anonymous
-      end
+      oic_session_id=session[:oic_session_id]
+      super(user)
+      session[:oic_session_id] = oic_session_id
     end
-  end # InstanceMethods
+  end
 end

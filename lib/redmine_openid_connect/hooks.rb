@@ -2,7 +2,11 @@ require_relative '../../app/models/oic_session'
 
 module RedmineOpenidConnect
   class Hooks < Redmine::Hook::ViewListener
-    render_on :view_account_login_top, :partial => 'hooks/redmine_openid_connect/redirect'
+    def view_account_login_top(context={})
+      if OicSession.enabled?
+        context[:controller].send(:render_to_string, {:partial => 'hooks/redmine_openid_connect/redirect'})
+      end
+    end
 
     def request
       ActionDispatch::Request.new(ENV)

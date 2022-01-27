@@ -1,6 +1,8 @@
 class OicSession < ActiveRecord::Base
   unloadable
 
+  belongs_to :user
+
   before_create :randomize_state!
   before_create :randomize_nonce!
 
