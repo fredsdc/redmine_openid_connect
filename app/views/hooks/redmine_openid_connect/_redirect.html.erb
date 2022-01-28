@@ -8,5 +8,8 @@
 <%= javascript_tag do %>
 $(document).ready(function(){
   $('#redirect_to_oic_login_url').appendTo($('#login-form form'));
+  <% if params[:local_login] == "true" %>
+    $("#login-form form").attr("action", $("#login-form form").attr("action") + "?local_login=true");
+  <% end %>
 });
 <% end %>

@@ -7,7 +7,7 @@ pt-BR:
     openid_connect_server_url: URL do servidor OpenID Connect
     client_secret: Client Secret
     group: Grupo autorizado (branco para todos os usuários)
-    admin_group: Gruopo de administradores (membros deste grupo são administradores)
+    admin_group: Grupo de administradores (membros deste grupo são administradores)
     dynamic_config_expiry: Tempo entre consultas da configuração openid (padrão 1 dia)
   redirect_to_oic_login_url: Login Único do Serpro
   or: ou
