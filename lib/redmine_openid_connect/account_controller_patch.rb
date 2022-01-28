@@ -96,41 +96,45 @@ module RedmineOpenidConnect
         user = User.find_by_mail(user_info[attrs[:mail]])
 
         if user.nil?
-          user = User.new
+          if OicSession.client_config[:create_user]
+            user = User.new
 
-          user.login = user_info[attrs[:login]].gsub(/ /, '')
-          name       = user_info[attrs[:first]].gsub(/  */, ' ').gsub(/^ /, '').gsub(/ $/, '')
-          surname    = user_info[attrs[:last]].gsub(/  */, ' ').gsub(/^ /, '').gsub(/ $/, '')
-          mail       = user_info[attrs[:mail]].gsub(/  */, ' ').gsub(/^ /, '').gsub(/ $/, '')
+            user.login = user_info[attrs[:login]].gsub(/ /, '')
+            name       = user_info[attrs[:first]].gsub(/  */, ' ').gsub(/^ /, '').gsub(/ $/, '')
+            surname    = user_info[attrs[:last]].gsub(/  */, ' ').gsub(/^ /, '').gsub(/ $/, '')
+            mail       = user_info[attrs[:mail]].gsub(/  */, ' ').gsub(/^ /, '').gsub(/ $/, '')
 
-          name.gsub!(/ .*/,'') if attrs[:first_comp]
-          surname.gsub!(/^[^ ]* /, '') if attrs[:last_comp]
+            name.gsub!(/ .*/,'') if attrs[:first_comp]
+            surname.gsub!(/^[^ ]* /, '') if attrs[:last_comp]
 
-          while surname.size > 30
-            surname.match?(/^. /) ? surname.gsub!(/^. /,'') : surname.gsub!(/^(.)[^ ]*/, '\1')
-          end
-
-          attributes = {
-            firstname:     name,
-            lastname:      surname,
-            mail:          mail,
-            last_login_on: Time.now
-          }
-
-          user.assign_attributes attributes
-
-          if user.save
-            user.update_attribute(:admin, true) if oic_session.admin?
-            oic_session.user_id = user.id
-            oic_session.save!
-            successful_authentication(user)
-          else
-            flash.now[:warning] ||= l(:error_unable_to_create_user, :name => user.login) + " "
-            user.errors.full_messages.each do |error|
-              logger.warn "#{l(:error_unable_to_create_user_due_to, :name => user.login, :error => error)}"
-              flash.now[:warning] += "#{error}. "
+            while surname.size > 30
+              surname.match?(/^. /) ? surname.gsub!(/^. /,'') : surname.gsub!(/^(.)[^ ]*/, '\1')
             end
-            return invalid_credentials
+
+            attributes = {
+              firstname:     name,
+              lastname:      surname,
+              mail:          mail,
+              last_login_on: Time.now
+            }
+
+            user.assign_attributes attributes
+
+            if user.save
+              user.update_attribute(:admin, true) if oic_session.admin?
+              oic_session.user_id = user.id
+              oic_session.save!
+              successful_authentication(user)
+            else
+              flash.now[:warning] ||= l(:error_unable_to_create_user, :name => user.login) + " "
+              user.errors.full_messages.each do |error|
+                logger.warn "#{l(:error_unable_to_create_user_due_to, :name => user.login, :error => error)}"
+                flash.now[:warning] += "#{error}. "
+              end
+              return invalid_credentials
+            end
+          else
+            flash.now[:error] ||= l(:notice_account_unknown_email) + " "
           end
         else
           user.update_attribute(:admin, true) if oic_session.admin?

@@ -40,6 +40,11 @@
   <%= check_box_tag 'settings[disable_ssl_validation]', true, @settings['disable_ssl_validation'] %>
 </p>
 
+<p>
+  <label><%= l(:field_onthefly) %></label>
+  <%= check_box_tag 'settings[create_user]', true, @settings['create_user'] %>
+</p>
+
 <fieldset class="box tabular"><legend><%=l(:label_attribute_plural)%></legend>
   <p>
     <label><%= l(:field_attr_domain) %></label>
