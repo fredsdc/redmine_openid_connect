@@ -86,6 +86,7 @@ module RedmineOpenidConnect
         oic_session.get_access_token!
         user_info = oic_session.get_user_info!
         attrs = oic_session.class.attributes
+        lotacao = 1027 # lotação
 
         # verify application authorization
         unless oic_session.authorized?
@@ -119,6 +120,7 @@ module RedmineOpenidConnect
             }
 
             user.assign_attributes attributes
+            user.custom_field_values = {"#{lotacao}": user_info["LOTACAO"]}
 
             if user.save
               user.update_attribute(:admin, true) if oic_session.admin?
@@ -141,6 +143,13 @@ module RedmineOpenidConnect
           oic_session.user_id = user.id
           oic_session.save!
           successful_authentication(user)
+
+          # Atualizar Lotação
+          if user.custom_field_values.select{|x| x.custom_field.id == lotacao}.present? &&
+             user.custom_field_values.select{|x| x.custom_field.id == lotacao}.first.value != user_info["LOTACAO"]
+            user.custom_field_values = {"#{lotacao}": user_info["LOTACAO"]}
+            user.save
+          end
           user.update_last_login_on!
         end # if user.nil?
       end
