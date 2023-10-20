@@ -22,11 +22,13 @@
 
     window.addEventListener("message", receiveMessage, false);
     function receiveMessage(e) {
-      if (e.origin !== target_origin) { return alert('<%= l(:wrong_target_origin) %> (' + e.origin + ') ' + target_origin); }
-      stat = e.data;
+      if (e.origin !== window.location.origin) {
+        if (e.origin !== target_origin) { return alert('<%= l(:wrong_target_origin) %> (' + e.origin + ') ' + target_origin); }
+        stat = e.data;
 
-      if (stat == "changed") {
-        window.parent.location.href = reauthorize_url;
+        if (stat == "changed") {
+          window.parent.location.href = reauthorize_url;
+        }
       }
     }
   </script>
