@@ -27,6 +27,7 @@
         const parsedUrl2 = new URL(target_origin);
 
         if (parsedUrl1.hostname !== parsedUrl2.hostname) { return alert('<%= l(:wrong_target_origin) %> (' + e.origin + ') ' + target_origin); }
+        if (e.origin !== target_origin) { return; }
         stat = e.data;
 
         if (stat == "changed") {
