@@ -5,6 +5,7 @@ class OicSession < ActiveRecord::Base
 
   before_create :randomize_state!
   before_create :randomize_nonce!
+  before_save :hash_tokens!
 
   def self.client_config
     Setting.plugin_redmine_openid_connect
@@ -222,5 +223,21 @@ class OicSession < ActiveRecord::Base
 
   def complete?
     self.access_token.present?
+  end
+
+  # Hash tokens before saving to keep index size manageable
+  def hash_tokens!
+    self.access_token_hash = Digest::MD5.hexdigest(access_token) if access_token.present?
+    self.refresh_token_hash = Digest::MD5.hexdigest(refresh_token) if refresh_token.present?
+  end
+
+  # Finder method using hashed access token
+  def self.find_by_access_token(token)
+    find_by(access_token_hash: Digest::MD5.hexdigest(token))
+  end
+
+  # Finder method using hashed refresh token
+  def self.find_by_refresh_token(token)
+    find_by(refresh_token_hash: Digest::MD5.hexdigest(token))
   end
 end
