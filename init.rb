@@ -2,6 +2,8 @@ require 'redmine'
 require 'redmine_openid_connect/application_controller_patch'
 require 'redmine_openid_connect/account_controller_patch'
 require 'redmine_openid_connect/hooks'
+require File.expand_path('app/middleware/oic_session_cleanup_middleware', __dir__)
+require File.expand_path('app/services/oic_session_cleanup_service', __dir__)
 
 Redmine::Plugin.register :redmine_openid_connect do
   name 'Redmine Openid Connect plugin'
